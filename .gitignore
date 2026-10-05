@@ -1,0 +1,12 @@
+# build / tooling output
+node_modules/
+web/dist/
+.frames/
+.ocio/
+.bmo_raw.glb
+*.blend1
+.log_*.txt
+__pycache__/
+
+# large regenerable media (make_videos.sh / render_previews.py)
+videos/

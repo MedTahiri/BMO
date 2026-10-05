@@ -1,0 +1,14 @@
+{
+  "hello": ["hello1.mp3", "hello2.mp3", "hello3.mp3"],
+  "laugh": ["laugh1.mp3", "laugh2.mp3", "laugh3.mp3"],
+  "surprise": ["surprise1.mp3", "surprise2.mp3", "surprise3.mp3"],
+  "sad": ["sad1.mp3", "sad2.mp3", "sad3.mp3"],
+  "babble": ["babble1.mp3", "babble2.mp3", "babble3.mp3", "babble4.mp3", "babble5.mp3", "babble6.mp3"],
+  "plop": "plop.mp3",
+  "boot": "boot.mp3",
+  "select": "select.mp3",
+  "win": "win.mp3",
+  "gameOver": "gameover.mp3",
+  "powerOn": "poweron.mp3",
+  "powerOff": "poweroff.mp3"
+}
