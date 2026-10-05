@@ -17,10 +17,10 @@ rig = bpy.data.objects["BMO_Rig"]
 cam = bpy.data.objects["Camera"]
 target = bpy.data.objects["Camera_Target"]
 reel = bpy.data.actions.get("BMO_Showreel")
-scene.render.resolution_x, scene.render.resolution_y = 1000, 750
+scene.render.resolution_x, scene.render.resolution_y = 1280, 960
 scene.render.image_settings.file_format = 'PNG'
 try:
-    scene.eevee.taa_render_samples = 32
+    scene.eevee.taa_render_samples = 64
 except Exception:
     pass
 # Linear output -> apply gamma ourselves when OCIO is unavailable (e.g. some Flatpak builds)

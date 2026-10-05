@@ -128,7 +128,7 @@ def lcd_material():
     ramp.color_ramp.interpolation = 'CONSTANT'
     ramp.color_ramp.elements[0].color = hex_lin('#C4F7CF')
     ramp.color_ramp.elements[1].position = 0.5
-    ramp.color_ramp.elements[1].color = hex_lin('#9FDCB0')
+    ramp.color_ramp.elements[1].color = hex_lin('#C4F7CF')  # plain screen (no grid), like the website
     nt.links.new(mx.outputs[0], ramp.inputs[0])
     em = N('ShaderNodeEmission'); em.name = "Emission"; em.location = (480, 100)
     em.inputs['Strength'].default_value = 1.0
