@@ -130,7 +130,7 @@ export const useBmo = create<BmoState>((set, get) => ({
 }))
 
 /** Non-reactive scroll data (read every frame by the 3D scene, never re-renders React). */
-export const scrollState = { anatomy: 0 }
+export const scrollState = { anatomy: 0, footer: 0, footerTop: 0 }
 
 export const prefersReducedMotion =
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches

@@ -4,6 +4,7 @@ import { Html, useAnimations, useGLTF } from '@react-three/drei'
 import { easing } from 'maath'
 import {
   Box3,
+  Quaternion,
   BufferAttribute,
   CanvasTexture,
   LoopOnce,
@@ -274,6 +275,18 @@ export function Bmo() {
   const hotModeRef = useRef(hotMode)
   const tmp = useMemo(() => new Vector3(), [])
   const watches = useRef(makeWatches())
+  // ---- footer peek: arm bones that get layered on top of the animation
+  const peekBones = useMemo(
+    () =>
+      ['body', 'arm_upper.L', 'arm_lower.L', 'hand.L', 'arm_upper.R', 'arm_lower.R', 'hand.R'].map(
+        (n) => scene.getObjectByName(sanitize(n)) ?? null,
+      ),
+    [scene],
+  )
+  const peek = useRef({ w: 0, y: 0, said: false })
+  const qa = useMemo(() => new Quaternion(), [])
+  const qb = useMemo(() => new Quaternion(), [])
+  const axis = useMemo(() => new Vector3(), [])
   const sound = useRef({ step: 0, talk: false, screen: true })
   const tmp2 = useMemo(() => new Vector3(), [])
 
@@ -283,7 +296,8 @@ export function Bmo() {
     const tgt = Object.assign(scratch.current, st.target)
     const a = current.current
     const name = currentName.current
-    const preset = presetFor(st.section, state.size.width / state.size.height)
+    const peeking = scrollState.footer > 0.01
+    const preset = presetFor(st.section, state.size.width / state.size.height, peeking)
 
     if (a && holdAt.current !== undefined && a.time * FPS >= holdAt.current) a.paused = true
 
@@ -392,6 +406,44 @@ export function Bmo() {
     easing.damp(outer.current.position, 'x', preset.x, lam, dt)
     const explodeTurn = st.section === 'anatomy' ? v.explode * 0.85 : 0
     easing.dampAngle(outer.current.rotation, 'y', preset.rotY + explodeTurn + sp.drag + sp.turn, lam, dt)
+
+    // ---- footer peek: chin on the footer's top edge, both hands up on the ledge
+    const pk = peek.current
+    easing.damp(pk, 'w', peeking ? scrollState.footer : 0, 0.15, dt)
+    if (peeking) {
+      // world y (on BMO's plane z=0) that projects onto the footer's top edge
+      const ndcY = 1 - 2 * (scrollState.footerTop / state.size.height)
+      tmp2.set(0, ndcY, 0.5).unproject(state.camera).sub(state.camera.position)
+      const t = -state.camera.position.z / tmp2.z
+      const edgeY = state.camera.position.y + tmp2.y * t
+      pk.y = edgeY - 1.02 // ledge just under BMO's screen, so the hands rest on top of it
+      if (!pk.said && scrollState.footer > 0.6) {
+        pk.said = true
+        sfx.play('hello')
+      }
+    } else if (scrollState.footer === 0) pk.said = false
+    outer.current.position.y = pk.y * Math.min(1, pk.w * 1.5)
+    if (pk.w > 0.001) {
+      // [bone index, BMO-local axis, degrees]: rotations about BMO's own axes, applied over the clip
+      const POSE: [number, 'x' | 'z', number][] = [
+        [0, 'x', 8],
+        [1, 'x', -168], [1, 'z', -14], [2, 'x', 52], [3, 'x', 45],
+        [4, 'x', -168], [4, 'z', 14], [5, 'x', 52], [6, 'x', 45],
+        // little "hi!" wiggle of both hands
+        [3, 'z', 18 * Math.sin(state.clock.elapsedTime * 5)],
+        [6, 'z', -18 * Math.sin(state.clock.elapsedTime * 5 + 1.2)],
+      ]
+      for (const [i, ax, deg] of POSE) {
+        const bone = peekBones[i]
+        if (!bone?.parent) continue
+        axis.set(ax === 'x' ? 1 : 0, 0, ax === 'z' ? 1 : 0).applyQuaternion(outer.current.quaternion)
+        bone.parent.updateWorldMatrix(true, false)
+        bone.parent.getWorldQuaternion(qa)
+        qb.setFromAxisAngle(axis, ((deg * Math.PI) / 180) * pk.w)
+        // local' = parentWorld⁻¹ · Δworld · parentWorld · local
+        bone.quaternion.premultiply(qa).premultiply(qb).premultiply(qa.invert())
+      }
+    }
 
     // walk carries BMO forward, then eases back
     const w = walker.current
