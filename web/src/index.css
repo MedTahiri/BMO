@@ -44,10 +44,8 @@ p { margin: 0 0 0.9em; line-height: 1.55; color: var(--ink-soft); font-size: 1.0
 .hotspot-wrap { pointer-events: none; }
 
 /* ---------- brand + nav */
-.brand { position: fixed; top: 14px; left: 18px; z-index: 5; display: flex; align-items: center; gap: 10px; pointer-events: none; padding: 6px 14px 6px 6px; border-radius: 16px; background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: background-color 0.9s ease; }
+.brand { position: fixed; top: 14px; left: 18px; z-index: 5; display: flex; align-items: center; gap: 10px; pointer-events: none; padding: 6px; border-radius: 16px; background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: background-color 0.9s ease; }
 .logo { font-weight: 700; font-size: 1.6rem; color: var(--ink); background: var(--teal); padding: 2px 12px; border-radius: 10px; box-shadow: 0 4px 0 var(--teal-dark); }
-.tag { font-size: 0.9rem; opacity: 0.7; }
-html[data-section='anatomy'] .brand .tag, html[data-section='tv'] .brand .tag { color: #fff; }
 
 .dots { position: fixed; right: 18px; top: 50%; transform: translateY(-50%); z-index: 5; display: flex; flex-direction: column; gap: 12px; }
 .dots a { width: 12px; height: 12px; border-radius: 50%; background: rgba(0,0,0,0.25); position: relative; transition: transform 0.2s, background 0.2s; }
@@ -154,7 +152,6 @@ html[data-section='anatomy'] .brand .tag, html[data-section='tv'] .brand .tag { 
   .hero-card { background: var(--card); border: 1px solid var(--card-border); padding: 20px; backdrop-filter: blur(14px); }
   .facts { grid-template-columns: 1fr; }
   .dots { display: none; }
-  .tag { display: none; }
   h1 { font-size: 2.4rem; }
   h2 { font-size: 1.7rem; }
   .hero-card p { font-size: 1rem; }

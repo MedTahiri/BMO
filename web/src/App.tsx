@@ -23,7 +23,6 @@ export default function App() {
       <Loader />
       <header className="brand">
         <span className="logo">BMO</span>
-        <span className="tag">an interactive fan page</span>
       </header>
       <Story />
       <Footer />
