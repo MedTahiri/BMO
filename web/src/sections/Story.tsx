@@ -25,23 +25,14 @@ function useSectionTracking() {
         const r = el.getBoundingClientRect()
         const span = Math.max(1, r.height - window.innerHeight)
         scrollState.anatomy = Math.min(1, Math.max(0, -r.top / span))
-        // footer: BMO peeks over its top edge
-        const f = document.querySelector('.site-footer')
-        if (f) {
-          const top = f.getBoundingClientRect().top
-          scrollState.footerTop = top
-          scrollState.footer = Math.min(1, Math.max(0, (window.innerHeight - top) / 160))
-        }
         document.documentElement.style.setProperty('--anatomy', scrollState.anatomy.toFixed(3))
       })
     }
     window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', onScroll)
     onScroll()
     return () => {
       io.disconnect()
       window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onScroll)
     }
   }, [setSection])
 }

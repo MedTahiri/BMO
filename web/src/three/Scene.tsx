@@ -18,7 +18,7 @@ function CameraRig() {
   const base = useRef(new Vector3(0.5, 1.35, 6.4))
   useFrame((state, dt) => {
     const { section } = useBmo.getState()
-    const p = presetFor(section, state.size.width / state.size.height, scrollState.footer > 0.01)
+    const p = presetFor(section, state.size.width / state.size.height)
     const lam = prefersReducedMotion ? 0.05 : 0.55
     const pull = section === 'anatomy' ? smoothPull(scrollState.anatomy) : 0
     easing.damp3(base.current, [p.cam[0] + pull * 0.6, p.cam[1] + pull * 0.2, p.cam[2] + pull * 1.6], lam, dt)

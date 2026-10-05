@@ -11,9 +11,6 @@ export interface Preset {
   eyesFollow?: boolean
 }
 
-/** BMO peeking over the footer's top edge (used whenever the footer scrolls into view). */
-export const PEEK: Preset = { cam: [0, 1.55, 6.2], look: [0, 1.35, 0], x: 0.95, rotY: -0.15, eyesFollow: true, locked: true }
-
 export const PRESETS: Record<Section, Preset> = {
   hero: { cam: [0.5, 1.35, 6.4], look: [0, 1.0, 0], x: 1.05, rotY: -0.35, eyesFollow: true },
   meet: { cam: [0, 1.25, 6.2], look: [0, 1.0, 0], x: -1.05, rotY: 0.4, turntable: true },
@@ -28,8 +25,8 @@ export const PRESETS: Record<Section, Preset> = {
 }
 
 /** Narrow screens: centre BMO and pull the camera back. */
-export function presetFor(section: Section, aspect: number, peek = false): Preset {
-  const p = peek ? PEEK : PRESETS[section]
+export function presetFor(section: Section, aspect: number): Preset {
+  const p = PRESETS[section]
   if (aspect >= 0.9) return p
   // copy sits in a bottom sheet, so frame BMO in the upper half
   const k = 1.9
