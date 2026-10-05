@@ -1,88 +1,163 @@
-# BMO – rigged & animatable Blender model
+# BMO: interactive 3D fan project
 
-Procedural model of BMO (Adventure Time), built entirely by `bmo_build.py` (Blender 5.1).
+**Live site → https://medtahiri.github.io/BMO/**
 
-| File | What |
+A fully procedural, rigged and animated **BMO** from *Adventure Time*, generated in Blender with Python and presented on an interactive React + three.js website. You can open BMO up, explode it, play games on its screen with its own buttons, and watch clips on BMO TV.
+
+Built with [Claude Code](https://claude.com/claude-code) by **Mohamed Tahiri**.
+
+![BMO hero render](renders/01_hero.png)
+
+| | | |
+|---|---|---|
+| ![Lid open](renders/05_lid_open.png) | ![Exploded view](renders/06_exploded.png) | ![Inside BMO](renders/16_heart.png) |
+| ![Battery bay](renders/15_battery_open.png) | ![Sitting](renders/13_sit.png) | ![Back](renders/03_back.png) |
+
+---
+
+## Website features
+
+The site is a scroll story in 10 sections. BMO is one persistent 3D character that the camera stages differently in each section.
+
+| Section | What BMO does |
 |---|---|
-| `bmo_build.py` | Generates the whole scene and saves `bmo.blend` |
-| `bmo.blend` | Ready-to-open result |
-| `render_previews.py` | Renders preview stills to `renders/` |
-| `render_videos.py` / `make_videos.sh` | Render every animation clip → `videos/*.mp4` |
-| `blender.sh` | Runs the Flatpak Blender with the fixed color config in `.ocio/` |
-| `renders/` | Preview images |
-| `videos/` | One MP4 per animation + `bmo_open_close.mp4` |
-| `export_web.py` | Exports the web model (GLB + `clips.json` property tracks) |
-| `web/` | React + three.js website presenting BMO |
+| **Who's BMO?** | Idles and follows your mouse with its eyes. Click BMO and it waves. |
+| **Meet BMO** | Turntable and talking, with a short character bio. |
+| **Face & feelings** | 7 expressions. BMO's real buttons react: D-pad looks, red laughs, green blinks, triangle gasps. |
+| **Under the faceplate** | Your scroll opens the faceplate, then explodes BMO into its parts. Hotspots explain each component. |
+| **Batteries included** | BMO turns around and the hinged battery door drops open to show 2 AA cells. |
+| **BMO Arcade** | 3 playable games rendered on BMO's LCD, controlled with BMO's own buttons. |
+| **BMO TV** | Official Cartoon Network clips play inside BMO's screen, or load your own video. BMO's buttons are the remote. |
+| **Moves gallery** | All 10 animations: Idle, Wave, Walk, Talk, Open up, Batteries, Explode, Play game, Sit, Sad. |
+| **Fun facts & episodes** | BMO sits like the toy figure. |
+| **Who made this** | About the author, with BMO waving from the side. |
 
-## Rebuild / render
+There's also a **Free play** drawer with every animation, expression and a slider for every control, plus a **sound toggle** in the top-right corner.
 
-```bash
-./blender.sh -b --factory-startup --python bmo_build.py -- --out bmo.blend
-./blender.sh -b bmo.blend --python render_previews.py -- renders              # all stills
-./make_videos.sh                                                              # all videos
-./make_videos.sh Sit,Sad                                                      # some videos
-./blender.sh bmo.blend                                                        # open the GUI with working colors
-```
-Render the showreel: open `bmo.blend` → Render → Render Animation (EEVEE, 1920×1080, frames 1–1009).
+### BMO Arcade
 
-## What's in the model
+The games are named after games BMO plays in the show. Only the titles (and the Guardians of Sunshine bosses) come from the show; the gameplay is my own interpretation.
 
-- **Shell**: hollow teal case with rounded body corners (like the printed figure), screw posts, 7-hole speaker grille, raised **BM** letters (the arm socket forms the "O"), 5 rear vents, and a **battery bay** with 2 AA cells, contacts and a hinged drop-down door
-- **Faceplate** (hinged on the left edge): screen window, cartridge slot, controller port, D-pad, triangle, green, red and blue buttons, two dash buttons, 4 countersunk screws (with threads)
-- **PCB** behind the faceplate: contact pads, chips with legs, pin headers, capacitors and traces
-- **Screen module**: emissive LCD with a pixel grid. The face is real geometry: eyes, plus a mouth with shape keys (Smile / Open / Frown / Surprise)
-- **Internals**: mint screen block over a stepped mustard cartridge drive (slot + glowing LEDs), grey power block with sockets, arched rainbow tubes, gold hourglass, and BMO's **heart**: a puffy 3D heart with a sleepy sculpted face and a gold medal (it beats)
-- **Limbs**: skinned noodle arms with little fingers; chunky dark-teal legs with round boot feet
-- **Accessories**: game controller whose cable is hooked to the front port and follows BMO, an insertable cartridge, a floor cartridge, screwdriver, spare screws
-- **Stage**: curved backdrop, 3 area lights, camera with a Track-To target
+- **Guardians of Sunshine**: a platformer where you beat Bouncy Bee, Hunny Bunny and Sleepy Sam. Attack mid-jump for a COMBO.
+- **Lumpy Space Invaders**: lumpy invaders march down, and the waves speed up.
+- **Bug Battle**: squash bugs popping out of nine holes. Gold bugs are worth 50.
 
-## Animating
+| BMO button | Keyboard | In games | On BMO TV |
+|---|---|---|---|
+| D-pad | Arrows / WASD | move, choose | ◀ ▶ seek 10s · ▲ ▼ volume |
+| Red | Z / Space | jump, fire, squash, start | play / pause |
+| Green | X | sword, fire | mute |
+| Triangle | C | (unused) | next channel |
+| Dashes | Enter | pause | next channel |
+| Blue dot | Esc | back to menu / exit | TV off / on |
 
-Select **BMO_Rig**. Everything is keyframable from its **Object → Custom Properties**:
+### Sound
+
+- **Sound effects** (buttons, doors, explosions, game blips) are synthesized live with the Web Audio API, so there are no audio files.
+- **BMO's voice lines** are AI text-to-speech generated on [fish.audio](https://fish.audio). No audio from the show is used.
+- Any sound can be replaced by listing a file in `web/public/sounds/sounds.json`. See `web/public/sounds/README.md` for the names.
+
+### Performance
+
+- three.js loads in a lazy chunk, so first paint needs about 75 KB of gzipped JS.
+- The model is a lossless meshopt GLB: 761 KB, about 320 KB gzipped.
+- Lighting is a procedural studio environment (PMREM), with no HDR download.
+- A blob shadow replaces shadow maps.
+- Raycasting is limited to clickable parts, and static parts skip matrix updates.
+- Adaptive pixel ratio uses `PerformanceMonitor`, and `prefers-reduced-motion` is honored.
+
+---
+
+## The Blender model
+
+Everything is generated by `bmo_build.py` (Blender 5.1). There are no hand-made assets.
+
+- **Shell**: hollow teal case with rounded corners, screw posts, speaker grille, raised **BM** letters (the arm socket forms the "O"), rear vents, and a battery bay with 2 AA cells and a hinged door.
+- **Faceplate**: hinged on the left edge, with screen window, cartridge slot, controller port, all the buttons and 4 threaded screws.
+- **PCB**: behind the faceplate, with contact pads, chips, pin headers and traces.
+- **Screen**: emissive LCD. The face is real geometry, and the mouth has shape keys (Smile, Open, Frown, Surprise).
+- **Internals**: screen block, stepped cartridge drive with LEDs, power block, rainbow tubes, hourglass, and BMO's puffy **heart** with a sleepy face and medal (it beats).
+- **Limbs**: skinned noodle arms with fingers, and chunky legs with round feet and leg IK.
+- **Accessories and stage**: controller with a cable hooked to the front port, cartridges, screwdriver, spare screws, backdrop, lights and camera.
+
+### Animating in Blender
+
+Select **BMO_Rig**. Everything is keyframable from **Object → Custom Properties**:
 
 | Property | Effect |
 |---|---|
 | `lid_open` 0–1 | faceplate swings open on its hinge |
-| `explode` 0–1 | exploded view: plate, PCB, spinning screws and screen fly forward |
-| `back_open` 0–1 | rear battery door swings down on its hinge, showing the 2 AA cells |
+| `explode` 0–1 | exploded view (plate, PCB, spinning screws, screen) |
+| `back_open` 0–1 | battery door swings down |
 | `face_smile` / `face_open` / `face_frown` / `face_surprise` | mouth expressions (mixable) |
-| `blink`, `eye_look_x`, `eye_look_z`, `eyes_happy` | eyes (`eyes_happy` turns them into ^ ^ arcs) |
-| `screen_on` 0–3 | LCD brightness (flicker, power off) |
-| `cartridge_insert` 0–1 | slides a cartridge into the slot (hidden at 0) |
+| `blink`, `eye_look_x`, `eye_look_z`, `eyes_happy` | eyes (`eyes_happy` = ^ ^) |
+| `screen_on` 0–3 | LCD brightness |
+| `cartridge_insert` 0–1 | slides a cartridge into the slot |
 
-**Bones** (Pose Mode): `root` (move the whole character), `body` (bob/tilt; all rigid parts follow), `arm_upper/arm_lower/hand.L/R` (FK), and the leg IK controls `foot_ik.L/R` and `knee_pole.L/R`.
+The **bones** are `root`, `body`, FK arms (`arm_upper/arm_lower/hand.L/R`) and leg IK (`foot_ik.L/R`, `knee_pole.L/R`).
 
-**Actions** (switch them in Dope Sheet → Action Editor): `BMO_Idle` (loop), `BMO_Wave`, `BMO_Walk` (in-place loop), `BMO_Talk`, `BMO_OpenLid`, `BMO_BatteryDoor`, `BMO_Explode`, `BMO_PlayGame`, `BMO_Sit`, `BMO_Sad`, plus `BMO_Showreel` (all of them in a row, with timeline markers; it's assigned by default).
+The **actions** are `BMO_Idle`, `BMO_Wave`, `BMO_Walk`, `BMO_Talk`, `BMO_OpenLid`, `BMO_BatteryDoor`, `BMO_Explode`, `BMO_PlayGame`, `BMO_Sit` and `BMO_Sad`, plus `BMO_Showreel`, which plays all of them in a row.
 
 The drivers only use simple expressions, so they work without enabling "Auto Run Python Scripts".
 
-## Website (`web/`)
+---
 
-A scroll-story fan page (React 19 + Vite + @react-three/fiber + drei + zustand) with 9 sections: hero, meet BMO, face & feelings, anatomy (scroll opens the faceplate, then explodes it, with hotspots on the parts), battery bay, **BMO Arcade**, **BMO TV**, moves gallery and fun facts.
+## Project structure
 
-- **BMO Arcade** runs on BMO's LCD (`web/src/games/`). There are 3 games named after games BMO plays in the show: *Guardians of Sunshine* (beat Bouncy Bee, Hunny Bunny and Sleepy Sam), *Lumpy Space Invaders* and *Bug Battle*. Only the titles and boss names come from the show; the gameplay is my interpretation. You play with BMO's 3D buttons (click them) or the keyboard (arrows/WASD, Z/Space, X, Enter, Esc).
-- **BMO TV** plays official Cartoon Network Adventure Time clips (YouTube embeds kept aligned over BMO's screen) or a video you load from your computer (shown on the LCD as a texture; it never leaves the browser). BMO's buttons are the remote: red play/pause, D-pad seek/volume, green mute, triangle/dashes next channel, blue dot TV off. It also has a **Free play** drawer with every animation, expression and control slider.
-
-```bash
-cd web
-npm install
-npm run dev        # http://localhost:5173
-npm run build      # production build in web/dist
-npm run model      # re-export bmo.glb + clips.json from bmo.blend after changing the model
+```
+bmo_build.py          Blender script that generates the whole model, rig and animations
+bmo.blend             generated Blender file
+export_web.py         exports web/public/models/bmo.glb + clips.json
+render_previews.py    renders preview stills to renders/
+render_videos.py      renders each animation clip (used by make_videos.sh)
+make_videos.sh        renders + encodes MP4s into videos/ (not committed)
+blender.sh            runs the Flatpak Blender with a fixed color config
+renders/              preview images
+web/                  React + three.js website
+  src/three/          3D scene: model, drivers, camera, LCD shader
+  src/games/          BMO Arcade (console + 3 games)
+  src/sections/       story sections, BMO TV, footer, free play
+  src/audio/          Web Audio sound effects
+  src/content/bmo.ts  all the site text, author info and credits
+  scripts/            model export, voice generation/import
+.github/workflows/    deploy to GitHub Pages
 ```
 
-How it works:
-- glTF can't carry Blender drivers. `export_web.py` exports meshes, the skin, the mouth morph targets and the 10 bone clips to GLB, and samples the custom-property curves (lid, face, eyes…) to `clips.json`. `web/src/three/drivers.ts` re-implements the drivers 1:1.
-- Clicking things on BMO works: buttons (D-pad looks around, red laughs, green blinks, triangle gasps, blue dot toggles the screen, dashes talk), the heart, the battery door and the faceplate. Clicking the body makes BMO wave. Drag sideways to spin BMO.
-- Performance:
-  - three.js loads in a lazy chunk (first paint ≈ 75 KB gzip of JS)
-  - GLB is lossless meshopt, 761 KB (≈ 320 KB gzip)
-  - studio lighting comes from a procedural PMREM, with no HDR download
-  - blob shadow instead of shadow maps
-  - raycasting is limited to clickable parts, and static parts skip matrix updates
-  - adaptive DPR via PerformanceMonitor
-  - honors `prefers-reduced-motion`
+## Running it
 
-## Note about the Flatpak Blender
+```bash
+# website
+cd web
+npm install
+npm run dev          # http://localhost:5173
+npm run build        # production build → web/dist
+npm run preview      # serve the build at /BMO/ like GitHub Pages
+npm run model        # re-export the model from bmo.blend after changing it
 
-The Flatpak (5.1.1) bundles an OCIO config of version 2.5, but its OpenColorIO library is 2.4, so color management falls back to raw output. `.ocio/` holds a copy of Blender's config, downgraded to 2.4 by removing three 2.5-only keys. `blender.sh` points Blender at it, so Standard/AgX/Filmic work again. Use `./blender.sh` instead of `flatpak run org.blender.Blender`.
+# Blender (from the repo root)
+./blender.sh -b --factory-startup --python bmo_build.py -- --out bmo.blend   # rebuild the model
+./blender.sh -b bmo.blend --python render_previews.py -- renders            # preview stills
+./make_videos.sh                                                            # MP4 per animation
+./blender.sh bmo.blend                                                      # open in the GUI
+```
+
+**Deploying**: every push to `main` builds `web/` and publishes it to GitHub Pages through `.github/workflows/deploy.yml`.
+
+**Flatpak Blender note**: the Flatpak (5.1.1) ships an OCIO 2.5 config with an OCIO 2.4 library, so color management is broken out of the box. `blender.sh` creates a patched copy in `.ocio/` on first run and points Blender at it, which makes Standard, AgX and Filmic work again.
+
+---
+
+## Credits & copyright
+
+- *Adventure Time*, BMO and all related characters and elements are trademarks of and © **Cartoon Network**. This is a **non-commercial fan project**. It is not affiliated with, sponsored or endorsed by Cartoon Network or Warner Bros. Discovery.
+- *Adventure Time* was created by Pendleton Ward. BMO is voiced by Niki Yang in the original series.
+- The video clips in BMO TV are official Cartoon Network uploads, embedded from YouTube.
+- The 3D model, rig, animations, games and website are original fan work by **Mohamed Tahiri**, made with Claude Code.
+- The sound effects are original synthesized audio. The BMO voice lines are AI text-to-speech generated on fish.audio. No audio from the show is used.
+
+If you're a rights holder and want something removed, open an issue or contact me on GitHub.
+
+## Author
+
+**Mohamed Tahiri**, Software Engineer
+[GitHub](https://github.com/MedTahiri) · [LinkedIn](https://www.linkedin.com/in/mohamed-tahiri-112239222/)
